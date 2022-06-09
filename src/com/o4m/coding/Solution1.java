@@ -2,7 +2,9 @@ package com.o4m.coding;
 
 import com.o4m.entity.ListNode;
 import com.o4m.entity.TreeNode;
+import sun.reflect.generics.tree.Tree;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,36 +110,120 @@ public class Solution1 {
 
     // lc450 删除二叉搜索树中的节点
     public TreeNode deleteNode(TreeNode root, int key) {
-        deleteDfs(root, key);
+        if (root == null) {
+            return null;
+        }
+        if (root.val > key) {
+            root.left = deleteNode(root.left, key);
+            return root;
+        }
+
+        if (root.val < key) {
+            root.right = deleteNode(root.right, key);
+            return root;
+        }
+
+        if (root.val == key) {
+            if (root.left == null && root.right == null) {
+                return null;
+            }
+            if (root.right != null) {
+                TreeNode tmp = root.right;
+                while (tmp.left != null) {
+                    tmp = tmp.left;
+                }
+                root.val = tmp.val;
+                root.right = deleteNode(root.right, root.val);
+            }
+            if (root.right == null) {
+                TreeNode tmp = root.left;
+                while (tmp.right != null) {
+                    tmp = tmp.right;
+                }
+                return tmp;
+            }
+        }
         return root;
     }
 
-    public TreeNode leftNode(TreeNode root) {
-        if (root.right != null) {
-            return root.right;
+    // lc415. 字符串相加
+    public String addStrings(String num1, String num2) {
+
+        int len1 = num1.length() - 1, len2 = num2.length() - 1, carry = 0;
+        StringBuilder ans = new StringBuilder();
+        while (len1 >= 0 || len2 >= 0 || carry != 0) {
+            int sum = 0;
+            sum += len1 < 0 ? 0 : num1.charAt(len1) - '0';
+            sum += len2 < 0 ? 0 : num2.charAt(len2) - '0';
+            sum += carry;
+            carry = sum / 10;
+            sum %= 10;
+            ans.append(sum);
+            len1--;
+            len2--;
         }
-        return leftNode(root.left);
+        return ans.reverse().toString();
     }
 
-    public void deleteDfs(TreeNode root, int key) {
-        if (root == null) {
-            return;
+    // lc179. 最大数
+    public String largestNumber(int[] nums) {
+        int n = nums.length;
+        String[] numsArr = new String[n];
+        for (int i = 0; i < n; i++) {
+            numsArr[i] = ""+nums[i];
         }
-        if (root.val > key) {
-            deleteNode(root.left, key);
-        } else if (root.val < key) {
-            deleteNode(root.right, key);
-        } else {
-            if (root.left == null && root.right == null) {
-                root = null;
-            } else if (root.right != null) {
-                root.val = root.right.val;
-                deleteNode(root.right, root.val);
-            } else {
-                TreeNode left = leftNode(root.left);
-                root.val = left.val;
-                left = null;
-            }
+
+        Arrays.sort(numsArr, (x, y) -> {
+            String a = "" + x + y, b = "" + y + x;
+            return b.compareTo(a);
+        });
+
+        StringBuilder ans = new StringBuilder();
+        for (String i : numsArr) {
+            ans.append(i);
         }
+
+        return ans.charAt(0) == 0 ? "0" : ans.toString();
     }
+
+    // lc198. 打家劫舍
+    public int rob(int[] nums) {
+        int first = nums[0];
+        int second = 0;
+        if (nums.length > 1) {
+            second = nums[1];
+        }
+        int max = Math.max(first, second);
+        for (int i = 2; i < nums.length; i++) {
+            int tmp = first + nums[i];
+            first = Math.max(first, second);
+            second = Math.max(second, tmp);
+            max = Math.max(tmp, max);
+        }
+        return max;
+    }
+
+
+    // lc142. 环形链表 II
+    public ListNode detectCycle(ListNode head) {
+        if (head == null) {
+            return null;
+        }
+        ListNode fast = head, slow = head;
+        do {
+            if (fast == null || slow == null || fast.next == null) {
+                return null;
+            }
+            fast = fast.next.next;
+            slow = slow.next;
+        } while (fast != slow);
+
+        ListNode tmp = head;
+        while (tmp != slow) {
+            tmp = tmp.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
 }
