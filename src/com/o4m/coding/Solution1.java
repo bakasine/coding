@@ -223,6 +223,7 @@ public class Solution1 {
             tmp = tmp.next;
             slow = slow.next;
         }
+
         return slow;
     }
 
