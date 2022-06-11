@@ -2,11 +2,10 @@ package com.o4m.coding;
 
 import com.o4m.entity.ListNode;
 import com.o4m.entity.TreeNode;
-import sun.reflect.generics.tree.Tree;
+import com.sun.source.tree.Tree;
+import org.w3c.dom.NodeList;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Solution1 {
 
@@ -103,47 +102,40 @@ public class Solution1 {
         landDfs(grid, dp, x , y-1);
 
         dp[x][y] = 1;
-
-
     }
-
 
     // lc450 删除二叉搜索树中的节点
     public TreeNode deleteNode(TreeNode root, int key) {
+        // 叶子节点直接删除, 有右节点取右之最左,无右节点取左之最右
         if (root == null) {
             return null;
         }
-        if (root.val > key) {
-            root.left = deleteNode(root.left, key);
-            return root;
-        }
-
         if (root.val < key) {
             root.right = deleteNode(root.right, key);
-            return root;
-        }
-
-        if (root.val == key) {
-            if (root.left == null && root.right == null) {
+        } else if (root.val > key) {
+            root.left = deleteNode(root.left, key);
+        } else {
+            if (root.right == null && root.left == null) {
                 return null;
             }
             if (root.right != null) {
-                TreeNode tmp = root.right;
-                while (tmp.left != null) {
-                    tmp = tmp.left;
+                TreeNode next = root.right;
+                while (next.left != null) {
+                    next = next.left;
                 }
-                root.val = tmp.val;
+                root.val = next.val;
                 root.right = deleteNode(root.right, root.val);
-            }
-            if (root.right == null) {
-                TreeNode tmp = root.left;
-                while (tmp.right != null) {
-                    tmp = tmp.right;
+            } else if (root.right == null) {
+                TreeNode pre = root.left;
+                while (pre.right != null) {
+                    pre = pre.right;
                 }
-                return tmp;
+                root.val = pre.val;
+                root.left = deleteNode(root.left, root.val);
             }
         }
         return root;
+
     }
 
     // lc415. 字符串相加
@@ -203,7 +195,6 @@ public class Solution1 {
         return max;
     }
 
-
     // lc142. 环形链表 II
     public ListNode detectCycle(ListNode head) {
         if (head == null) {
@@ -226,4 +217,21 @@ public class Solution1 {
         return slow;
     }
 
+    // lc94. 二叉树的中序遍历
+    public List<Integer> inorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> list = new ArrayList<>();
+
+        while (!stack.empty() || root !=null) {
+            while (root != null) {
+                stack.push(root);
+                root = root.left;
+            }
+            root = stack.pop();
+            list.add(root.val);
+            root = root.right;
+        }
+
+        return list;
+    }
 }
